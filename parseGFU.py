@@ -86,5 +86,4 @@ def convert (hdf):
     for event in arr.T:
         event["para_ang_err"] *= event["logE"] < threshold
         event["boot_ang_err"] *= event["logE"] >= threshold
-        event["cr_ang_err"]   *= event["para_ang_err"] == 0
-                                 and event["boot_ang_err"] == 0
+        event["cr_ang_err"]   *= event["para_ang_err"] == 0 and event["boot_ang_err"] == 0
