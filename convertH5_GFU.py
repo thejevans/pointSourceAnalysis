@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-"""
+'''
 Template to convert from HDF5 files to NPY numpy array Files. This implementation uses
 parseGFU.py to parse the data
-"""
+'''
 
 # Imports
 from __future__ import print_function
@@ -13,12 +13,12 @@ import numpy as np
 import parseGFU
 
 # Command parsing
-usage = "%prog [options] --infile <hdf5 file> --outdir <output directory>"
+usage = '%prog [options] --infile <hdf5 file> --outdir <output directory>'
 parser = OptionParser(usage = usage, description=__doc__)
-parser.add_option("-i", "--infile", type = "string", default = None,
-                  help = "HDF5 file to be parsed")
-parser.add_option("-o", "--outdir", type = "string", default = './',
-                  help = "NPY file output path")
+parser.add_option('-i', '--infile', type = 'string', default = None,
+                  help = 'HDF5 file to be parsed')
+parser.add_option('-o', '--outdir', type = 'string', default = './',
+                  help = 'NPY file output path')
 (options, args) = parser.parse_args()
 
 inFile = options.infile
