@@ -1,17 +1,7 @@
 #!/usr/bin/env python
 
 """
-Converts HDF5 Files from the GFU sample to a numpy array file. Uses Cramer-Rao
-method for determining angular error. This method requires a pull correction due
-to artificial results from higher energies. In order to get a 1-sigma error on
-RA and Dec, I used the fit for (Cramer-Rao, Spline MPE, 50%). This pull
-correction is then divided by 1.144 to get a 39% error circle, which corresponds
-to a 1-sigma error. This factor assumes a 2-D Gaussian distribution, and will
-need to be altered if you want to use a Kent distribution.
 
-Resources:
-https://wiki.icecube.wisc.edu/index.php/IC-40_CramerRao_Comparison
-https://wiki.icecube.wisc.edu/index.php/Optical_Follow-Up_Pull_Correction_2016
 """
 
 # Imports

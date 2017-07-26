@@ -1,16 +1,28 @@
-
 # Imports
 from __future__ import print_function
 import tables
 import numpy as np
 from icecube import astro
 
-# Function for polynomial pull correction
 def pullCorrection (ang_err, logE, a, b, c, d, e, f):
+    '''Corrects the angular error of an event based on a 5th-order polynomial and the energy'''
     poly = lambda X: (a * X**5 + b * X**4 + c * X**3 + d * X**2 + e * X + f)
     return ang_err * poly(logE)
 
 def convert (hdf):
+    '''
+    Converts HDF5 Files from the GFU sample to a numpy array file. Uses Bootstrap,
+    Paraboloid, and Cramer-Rao methods for determining angular error. These methods
+    require a pull correction due to artificial results from higher energies. In order to
+    get a 1-sigma error on RA and Dec, I used the pull correction formulae for 50%
+    contained probability and divided by 1.144 to get a 39% error circle, which
+    corresponds to a 1-sigma error. This factor assumes a 2-D Gaussian distribution, and
+    will need to be altered if you want to use a Kent distribution.
+
+    Resources:
+    https://wiki.icecube.wisc.edu/index.php/IC-40_CramerRao_Comparison
+    https://wiki.icecube.wisc.edu/index.php/Optical_Follow-Up_Pull_Correction_2016
+    '''
     f    = hdf.root
     data = f.OnlineL2_SplineMPE.cols
 
@@ -37,15 +49,12 @@ def convert (hdf):
     arr["boot_ang_err"] = f.OnlineL2_SplineMPE_Bootstrap_Angular.cols.value[:]
 
     # Convert to RA and Dec from zenith, azimuth, and time and add to array
-    arr["ra"], arr["dec"] = astro.dir_to_equa(arr["zenith"],
-                                              arr["azimuth"],
-                                              arr["time_mjd"])
+    arr["ra"], arr["dec"] = astro.dir_to_equa(arr["zenith"], arr["azimuth"], arr["time_mjd"])
 
     # Compute paraboloid sigma and add to array
     para_zenith_err     = f.OnlineL2_SplineMPE_ParaboloidFitParams.cols.err1[:]
     para_azimuth_err    = f.OnlineL2_SplineMPE_ParaboloidFitParams.cols.err2[:]
-    arr["para_ang_err"] = np.sqrt((para_zenith_err**2 + para_azimuth_err**2)
-                                  / 2)
+    arr["para_ang_err"] = np.sqrt((para_zenith_err**2 + para_azimuth_err**2) / 2)
 
     # Compute Cramer-Rao sigma and add to array
     cr_zenith_err     = f.OnlineL2_SplineMPE_CramerRao_cr_zenith[:]['value']
@@ -87,5 +96,6 @@ def convert (hdf):
     for event in arr.T:
         event["para_ang_err"] *= event["logE"] < threshold
         event["boot_ang_err"] *= event["logE"] >= threshold
-        event["cr_ang_err"]   *= (event["para_ang_err"] == 0
-                                  and event["boot_ang_err"] == 0)
+        event["cr_ang_err"]   *= event["para_ang_err"] == 0 and event["boot_ang_err"] == 0
+
+    return arr
