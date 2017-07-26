@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 """
-
+Template to convert from HDF5 files to NPY numpy array Files. This implementation uses
+parseGFU.py to parse the data
 """
 
 # Imports
@@ -32,9 +33,7 @@ if outDir.rfind('/') != len(outDir)-1:
     outDir = ''.join([outDir, '/'])
 
 # Set output file name based on input file name
-outFile = ''.join([outDir,
-                   inFile[inFile.rfind('/')+1:inFile.rfind('.')],
-                   '.npy'])
+outFile = ''.join([outDir, inFile[inFile.rfind('/')+1:inFile.rfind('.')], '.npy'])
 
 # Read in .h5 file
 hdf = tables.openFile(inFile)
