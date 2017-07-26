@@ -44,7 +44,8 @@ def convert (hdf):
     # Compute paraboloid sigma and add to array
     para_zenith_err     = f.OnlineL2_SplineMPE_ParaboloidFitParams.cols.err1[:]
     para_azimuth_err    = f.OnlineL2_SplineMPE_ParaboloidFitParams.cols.err2[:]
-    arr["para_ang_err"] = np.sqrt((para_zenith_err**2 + para_azimuth_err**2) / 2)
+    arr["para_ang_err"] = np.sqrt((para_zenith_err**2 + para_azimuth_err**2)
+                                  / 2)
 
     # Compute Cramer-Rao sigma and add to array
     cr_zenith_err     = f.OnlineL2_SplineMPE_CramerRao_cr_zenith[:]['value']
@@ -86,4 +87,5 @@ def convert (hdf):
     for event in arr.T:
         event["para_ang_err"] *= event["logE"] < threshold
         event["boot_ang_err"] *= event["logE"] >= threshold
-        event["cr_ang_err"]   *= event["para_ang_err"] == 0 and event["boot_ang_err"] == 0
+        event["cr_ang_err"]   *= (event["para_ang_err"] == 0
+                                  and event["boot_ang_err"] == 0)
