@@ -30,15 +30,15 @@ def convert (hdf):
                                            ('logE', np.float),
                                            ('ra', np.float),
                                            ('dec', np.float),
-                                           ('ang_err', np.float),
+                                           ('ang_err', np.float)])
 
     # Copy needed data to array
-    arr['run']          = data.Run[:]
-    arr['event']        = data.Event[:]
-    arr['azimuth']      = data.azimuth[:]
-    arr['zenith']       = data.zenith[:]
-    arr['time_mjd']     = f.I3EventHeader.cols.time_start_mjd[:]
-    arr['logE']         = np.log10(f.OnlineL2_SplineMPE_MuEx.cols.energy[:])
+    arr['run']      = data.Run[:]
+    arr['event']    = data.Event[:]
+    arr['azimuth']  = data.azimuth[:]
+    arr['zenith']   = data.zenith[:]
+    arr['time_mjd'] = f.I3EventHeader.cols.time_start_mjd[:]
+    arr['logE']     = np.log10(f.OnlineL2_SplineMPE_MuEx.cols.energy[:])
 
     # Convert to RA and Dec from zenith, azimuth, and time and add to array
     arr['ra'], arr['dec'] = astro.dir_to_equa(arr['zenith'], arr['azimuth'], arr['time_mjd'])
@@ -52,7 +52,7 @@ def convert (hdf):
     OneSigmaFactor = 1 / 1.144
 
     # Apply pull correction and conversion to 1-sigma
-    pull_coeff = [0.03662, -0.70540, 5.38363, -19.84729, 34.88499, -22.33384]
+    pull_coeff      = [0.03662, -0.70540, 5.38363, -19.84729, 34.88499, -22.33384]
     arr['ang_err'] *= np.polyval(pull_coeff, arr['logE']) * OneSigmaFactor
 
     return arr
