@@ -1,4 +1,3 @@
-# Imports
 from __future__ import print_function
 import tables
 import numpy as np
@@ -49,10 +48,12 @@ def convert (hdf):
     arr['ang_err'] = np.sqrt((zenith_err**2 + (azimuth_err * np.sin(arr['zenith']))**2) / 2)
 
     # Define factor to convert from 50% error circle to 1-sigma error circle
-    OneSigmaFactor = 1 / 1.144
+    oneSigmaFactor = 1 / 1.144
 
-    # Apply pull correction and conversion to 1-sigma
+    # Apply pull correction and conversion to 1-sigma (if pull correction gives a value
+    # less than 1, make it 1 instead)
     pull_coeff      = [0.03662, -0.70540, 5.38363, -19.84729, 34.88499, -22.33384]
-    arr['ang_err'] *= np.polyval(pull_coeff, arr['logE']) * OneSigmaFactor
+    pull_corr       = np.polyval(pull_coeff, arr['logE'])
+    arr['ang_err'] *= oneSigmaFactor * np.array([1 if x < 1 else x for x in pull_corr])
 
     return arr
