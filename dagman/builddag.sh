@@ -45,12 +45,12 @@
 ##################################################################
 
 jobbase='distributedTSD'
-script="/data/i3store0/users/jevans96/point_source_analysis/scripts/dagman/distributedTSD.py"
+script="/data/i3store0/users/jevans96/point_source_analysis/scripts/distributedTSD.py"
 maindir="/data/i3store0/users/jevans96/point_source_analysis/distributed_outputs/data/"
-stdargs="--iter 100 --verbose"
+stdargs="--iter 1000 --verbose"
 
 ### seq <min> <stepsize> <max>
-for a in `seq 100`; do
+for a in `seq 1000`; do
     outfile="${maindir}set_${a}.npy"
     command="python ${script} ${stdargs} --outfile ${outfile}"
     jobname=$jobbase.$a
