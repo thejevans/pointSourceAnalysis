@@ -35,26 +35,33 @@ def genTSD(arr, iterations):
 
 def plotTSD(TSD, arr, outfile):
     arr, source, bandWidth = trimDec(arr)
-    # fig, ax = plt.subplots()
-    # ax.hist(TSD, bins = max(TSD) - min(TSD), log = True, align = 'left')
-    # ax.set_xticks(range(int(min(TSD)),int(max(TSD)), int((max(TSD) - min(TSD))/10)))
-    # ax.set_xlim(min(TSD) - .5, max(TSD) - .5)
-    # title = '\n'.join(['Test statistic distribution of {0:d} trials, {1:d} events per trial',
-    #                   '{2:.2f} degree(s) around {3}'])
-    # plt.title(title.format(len(TSD), len(arr), np.degrees(bandWidth), source['name']))
-    # plt.xlabel('Background Likelihood')
-    # plt.ylabel('log_10 Frequency')
 
-    fig, ax = plt.subplots()
-    ccdf = 1 - np.cumsum(TSD)/np.sum(TSD)
-    ax.plot(ccdf)
-    ax.set_xticks(range(int(min(ccdf)),int(max(ccdf)), int((max(ccdf) - min(ccdf))/10)))
-    ax.set_xlim(min(ccdf) - .5, max(ccdf) - .5)
-    ax.set_ylim(0,1)
+    # plot formatting
     title = '\n'.join(['Test statistic distribution of {0:d} trials, {1:d} events per trial',
-                      '{2:.2f} degree(s) around {3}'])
+                       u'{2:4g}\xb0 around {3}'])
+    fig, ax = plt.subplots()
+
+    # plot TSD
+    hist = ax.hist(TSD, bins = max(TSD) - min(TSD), log = True, align = 'left', histtype='step')
+
+    # compute p-values
+    ccdf = 1 - np.cumsum(hist[0]) * 1./np.sum(hist[0])
+
+    # more plot formatting
+    ax.set_xticks(range(int(min(TSD)),int(max(TSD)), int((max(TSD) - min(TSD))/10)))
+    ax.set_xlim(min(TSD) - .5, max(TSD) - .5)
+    ax.set_ylim(1,1e4)
     plt.title(title.format(len(TSD), len(arr), np.degrees(bandWidth), source['name']))
     plt.xlabel('Background Likelihood')
-    plt.ylabel('p-value')
+    plt.ylabel('log_10 Frequency', color = 'b')
+    ax2 = ax.twinx()
 
+    # plot p-values
+    ax2.plot(hist[1][:-1], ccdf, 'r-')
+
+    # even more plot formatting
+    ax2.set_xlim(min(TSD) - .5, max(TSD) - .5)
+    ax2.set_ylabel('p-value', color = 'r')
+
+    # save plot
     fig.savefig(outfile)
