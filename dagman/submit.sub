@@ -33,7 +33,7 @@ output         = $(initialdir)$(Jobname).$(Cluster).out
 error          = $(initialdir)$(Jobname).$(Cluster).err
 
 # Only 1 log file for all jobs
-log = /data/i3store0/users/jevans96/point_source_analysis/distributed_outputs/$(Jobname).log
+log = /data/i3store0/users/jevans96/point_source_analysis/distributed_outputs/out_err/$(Jobname).log
 
 # Other condor stuff
 notification   = never

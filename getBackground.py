@@ -37,9 +37,10 @@ def plotTSD(TSD, arr, outfile):
     arr, source, bandWidth = trimDec(arr)
 
     # plot formatting
-    title = '\n'.join(['Test statistic distribution of {0:d} trials, {1:d} events per trial',
-                       u'{2:4g}\xb0 around {3}'])
-    fig, ax = plt.subplots()
+    mainTitle = r'Test statistic distribution of 10$^{{ {0:d} }}$ trials, {1:d} events per trial'
+    subTitle  = u'{2:4g}\xb0 around {3}'
+    title     = '\n'.join([mainTitle,subTitle])
+    fig, ax   = plt.subplots()
 
     # plot TSD
     hist = ax.hist(TSD, bins = max(TSD) - min(TSD), log = True, align = 'left', histtype='step')
@@ -50,14 +51,18 @@ def plotTSD(TSD, arr, outfile):
     # more plot formatting
     ax.set_xticks(range(int(min(TSD)),int(max(TSD)), int((max(TSD) - min(TSD))/10)))
     ax.set_xlim(min(TSD) - .5, max(TSD) - .5)
-    ax.set_ylim(1,1e4)
-    plt.title(title.format(len(TSD), len(arr), np.degrees(bandWidth), source['name']))
+    ax.set_ylim(1, 10**(int(np.log10(max(hist[0]))) + 1))
+    plt.title(title.format(np.log10(len(TSD)), len(arr), np.degrees(bandWidth), source['name']))
     plt.xlabel('Background Likelihood')
-    plt.ylabel('log_10 Frequency', color = 'b')
+    plt.ylabel(r'log$_{10}$ Frequency', color = 'b')
     ax2 = ax.twinx()
 
-    # plot p-values
+    # plot p-values and shade .05 to .95 interval
     ax2.plot(hist[1][:-1], ccdf, 'r-')
+    plt.axvspan(hist[1][np.argmin((0.95-ccdf)**2)],
+                hist[1][np.argmin((0.05-ccdf)**2)],
+                facecolor='0.2',
+                alpha=0.5)
 
     # even more plot formatting
     ax2.set_xlim(min(TSD) - .5, max(TSD) - .5)
