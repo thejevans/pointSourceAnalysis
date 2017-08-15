@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def genTS(arr):
-    arr, source, bandWidth = trimDec(arr)
+def genTS(arr, bandWidth = np.radians(1)):
+    arr, source = trimDec(arr, bandWidth)
 
     # scramble azimuth data
     arr['ra'] = np.random.rand(len(arr)) * 2 * np.pi
@@ -13,7 +13,7 @@ def genTS(arr):
     # return as likelihood
     return len([x for x in distFromSource if x < bandWidth])
 
-def trimDec(arr):
+def trimDec(arr, bandWidth = np.radians(1)):
     # define source
     source = {'name':'Milagro 1908',
               'sigma':np.radians(0.06),
@@ -22,19 +22,17 @@ def trimDec(arr):
 
     # use 1 degree band
 #    bandWidth = 3 * source['sigma']
-    bandWidth = np.radians(1)
 
     # trim to dec band around source and return
     return (np.array([x for x in arr.T if np.abs(x['dec']-source['dec']) < bandWidth]),
-            source,
-            bandWidth)
+            source)
 
-def genTSD(arr, iterations):
+def genTSD(arr, iterations = 10000, bandWidth = np.radians(1)):
     # return as a test statistic distribution
-    return [genTS(arr) for _ in xrange(iterations)]
+    return [genTS(arr, bandWidth) for _ in xrange(iterations)]
 
-def plotTSD(TSD, arr, outfile):
-    arr, source, bandWidth = trimDec(arr)
+def plotTSD(TSD, arr, outfile, bandWidth = np.radians(1)):
+    arr, source = trimDec(arr, bandWidth)
 
     # plot formatting
     mainTitle = r'Test statistic distribution of 10$^{{ {0:d} }}$ trials, {1:d} events per trial'
@@ -57,12 +55,14 @@ def plotTSD(TSD, arr, outfile):
     plt.ylabel(r'log$_{10}$ Frequency', color = 'b')
     ax2 = ax.twinx()
 
-    # plot p-values and shade .05 to .95 interval
+    # plot p-values
     ax2.plot(hist[1][:-1], ccdf, 'r-')
-    plt.axvspan(hist[1][np.argmin((0.95-ccdf)**2)],
-                hist[1][np.argmin((0.05-ccdf)**2)],
-                facecolor='0.2',
-                alpha=0.5)
+
+    # shade .05 to .95 interval
+    #plt.axvspan(hist[1][np.argmin((0.95-ccdf)**2)],
+    #            hist[1][np.argmin((0.05-ccdf)**2)],
+    #            facecolor='0.2',
+    #            alpha=0.5)
 
     # even more plot formatting
     ax2.set_xlim(min(TSD) - .5, max(TSD) - .5)

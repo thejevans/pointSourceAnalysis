@@ -28,12 +28,12 @@
 executable = /data/condor_builds/users/elims/software/ir041102/build/env-shell.sh
 
 # Where the log, out, err files will live
-initialdir     = /data/i3store0/users/jevans96/point_source_analysis/distributed_outputs/logs/
+initialdir     = /data/i3store0/users/jevans96/point_source_analysis/distributed_outputs/out_err/
 output         = $(initialdir)$(Jobname).$(Cluster).out
 error          = $(initialdir)$(Jobname).$(Cluster).err
 
 # Only 1 log file for all jobs
-log = /data/i3store0/users/jevans96/point_source_analysis/distributed_outputs/out_err/$(Jobname).log
+log = /data/i3store0/users/jevans96/point_source_analysis/distributed_outputs/logs/$(Jobname).log
 
 # Other condor stuff
 notification   = never
