@@ -2,7 +2,7 @@
 from __future__ import print_function
 from optparse import OptionParser
 import numpy as np
-import getBackground
+import injectEvents
 
 import time, socket
 print ('########################################################################################')
@@ -23,34 +23,22 @@ parser.add_option("-o", "--outfile", type = "string",
 parser.add_option("-t", "--iter", type = "int",
                   default = 10,
                   help = "number of iterations")
-parser.add_option("-s", "--steps", type = "int",
-                  default = 10,
-                  help = "number of steps")
 parser.add_option("-v", "--verbose", action = "store_true",
                   default = False,
                   help = "print out if true")
 (options, args) = parser.parse_args()
 
 iterations = options.iter
-steps      = options.steps
-infile     = options.infile
-outfile    = options.outfile
-verbose    = options.verbose
+infile = options.infile
+outfile = options.outfile
+verbose = options.verbose
 
 # other constants
 start_time = time.time() ## I always time my code ...
 
 arr = np.load(infile)
 
-start = np.radians(.5)
-stop  = np.radians(5)
-step  = (stop - start) / steps
-
-data = np.empty(steps, dtype = [('bandWidth', np.float),('TSD', np.int, iterations)])
-
-for i, band in enumerate(np.arange(start, stop, step)):
-    data['bandWidth'][i] = band
-    data['TSD'][i][:] = getBackground.genTSD(arr, bandWidth = band, iterations = iterations)
+data = injectEvents.genTSD(arr, iterations = iterations, rate_mu = 40, rate_sigma = 5)
 
 if verbose:
     print ('#### numpy file loaded {0} ...'.format(infile))
