@@ -35,12 +35,13 @@ filenames = sorted(glob(''.join([inDir, '*.npy'])))
 inFile    = filenames[0]
 
 # Combine and save data
-data = np.empty(0)
+data = np.empty([0,2])
 
 arr = np.load(filenames[0])[1]
 
 for filename in filenames:
-    data = np.append(data, np.load(filename)[0])
+    inArr = np.load(filename)[0]
+    data = np.append(data, inArr, axis=0)
 
 # Set output file name based on input file name
 outFile = ''.join([outDir, 'TSD_{0}_Trials'.format(len(data)), '.png'])

@@ -8,7 +8,7 @@ def genTS(arr, bandWidth = np.radians(1)):
     distFromSource = np.sqrt((arr['ra'] - source['ra'])**2 + (arr['dec'] - source['dec'])**2)
 
     # return as likelihood
-    return len([x for x in distFromSource if x < bandWidth]), arr
+    return len([x for x in distFromSource if x < bandWidth]), arr, source
 
 def scramble(arr, bandWidth):
     arr, source = trimDec(arr, bandWidth)

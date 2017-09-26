@@ -38,7 +38,7 @@ start_time = time.time() ## I always time my code ...
 
 arr = np.load(infile)
 
-data = injectEvents.genTSD(arr, iterations = iterations, rate_mu = 40, rate_sigma = 5)
+data = injectEvents.genTSD(arr, iterations = iterations, rate_mu = 60, rate_sigma = 5)
 
 if verbose:
     print ('#### numpy file loaded {0} ...'.format(infile))

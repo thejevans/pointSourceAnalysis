@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 def genTS(arr,
           bandWidth = np.radians(1),
           pos_mu = None,
-          pos_sigma = 1.0,
+          pos_sigma = None,
           rate_mu = None,
           rate_sigma = None,
           lam = None):
@@ -20,13 +20,16 @@ def genTS(arr,
         return None
 
     # get background distribution
-    backgroundTS, source = getBackground.scramble(arr, bandWidth)
+    backgroundLikelihood, backgroundTS, source = getBackground.genTS(arr, bandWidth)
 
     if pos_mu is None:
         pos_mu = [source['ra'], source['dec']]
+    if pos_sigma is None:
+        pos_sigma = source['sigma']
 
     # return as likelihood
-    return likelihood(backgroundTS, bandWidth, source, rate, pos_mu, pos_sigma)
+    return np.array([likelihood(backgroundTS, bandWidth, source, rate, pos_mu, pos_sigma),
+            backgroundLikelihood])
 
 def likelihood(backgroundTS, bandWidth, source, rate, pos_mu, pos_sigma):
     RAs, Decs = backgroundTS['ra'], backgroundTS['dec']
@@ -49,16 +52,16 @@ def likelihood(backgroundTS, bandWidth, source, rate, pos_mu, pos_sigma):
     return len([x for x in distFromSource if x < bandWidth])
 
 def genTSD(arr,
-           iterations = 10000,
+           iterations = 100,
            bandWidth = np.radians(1),
            pos_mu = None,
-           pos_sigma = 1.0,
+           pos_sigma = None,
            rate_mu = None,
            rate_sigma = None,
            lam = None):
     # return as a test statistic distribution
     args = arr, bandWidth, pos_mu, pos_sigma, rate_mu, rate_sigma, lam
-    return [genTS(*args) for _ in xrange(iterations)]
+    return np.array([genTS(*args) for _ in xrange(iterations)])
 
 def getRateGaussian(mu, sigma):
     # define injection rate distribution
@@ -81,8 +84,11 @@ def plotTSD(TSD, arr, outfile, bandWidth = np.radians(1)):
     title     = '\n'.join([mainTitle,subTitle])
     fig, ax   = plt.subplots()
 
-    # plot TSD
-    hist = ax.hist(TSD, bins = max(TSD) - min(TSD), log = True, align = 'left', histtype='step')
+    # plot injected TSD
+    hist = ax.hist(TSD.T[0], bins = max(TSD.T[0]) - min(TSD.T[0]), log = True, align = 'left', histtype='step')
+
+    # plot background TSD
+    hist2 = ax.hist(TSD.T[1], bins = max(TSD.T[1]) - min(TSD.T[1]), log = True, align = 'left', histtype='step')
 
     # compute p-values
     # ccdf = 1 - np.cumsum(hist[0]) * 1./np.sum(hist[0])
@@ -97,7 +103,7 @@ def plotTSD(TSD, arr, outfile, bandWidth = np.radians(1)):
     # more plot formatting
     # ax.set_xlim(max(0, mean - 5 * sigma), mean + 5 * sigma)
     ax.set_ylim(1, 10**(int(np.log10(max(hist[0]))) + 1))
-    plt.title(title.format(np.log10(len(TSD)), len(arr), np.degrees(bandWidth), source['name']))
+    plt.title(title.format(int(np.log10(len(TSD.T[0]))), len(arr), np.degrees(bandWidth), source['name']))
     plt.xlabel('Number of Events in Bin')
     plt.ylabel('Counts', color = 'b')
     # plt.axvline(x = mean, linestyle = '--')
