@@ -91,7 +91,7 @@ def plotTSD(TSD, arr, outfile, bandWidth = np.radians(1)):
     hist2 = ax.hist(TSD.T[1], bins = max(TSD.T[1]) - min(TSD.T[1]), log = True, align = 'left', histtype='step')
 
     # compute p-values
-    ccdf = 1 - np.cumsum(hist[0]) * 1./np.sum(hist[0])
+    ccdf = 1 - np.cumsum(hist[1]) * 1./np.sum(hist[1])
 
     # compute mean and sigma for background
     mean_bg, sigma_bg = np.mean(TSD.T[1]), np.std(TSD.T[1])
