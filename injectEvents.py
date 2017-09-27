@@ -91,34 +91,39 @@ def plotTSD(TSD, arr, outfile, bandWidth = np.radians(1)):
     hist2 = ax.hist(TSD.T[1], bins = max(TSD.T[1]) - min(TSD.T[1]), log = True, align = 'left', histtype='step')
 
     # compute p-values
-    # ccdf = 1 - np.cumsum(hist[0]) * 1./np.sum(hist[0])
+    ccdf = 1 - np.cumsum(hist[0]) * 1./np.sum(hist[0])
 
-    # compute mean and sigma
-    # mean, sigma = np.mean(TSD), np.std(TSD)
+    # compute mean and sigma for background
+    mean_bg, sigma_bg = np.mean(TSD.T[1]), np.std(TSD.T[1])
+
+    # compute mean for signal
+    mean_sig, sigma_sig = np.mean(TSD.T[0]), np.std(TSD.T[0])
 
     # set x ticks
     # xticks = range(int(mean - 5 * sigma),int(mean + 5 * sigma), int(sigma))
     # ax.set_xticks(xticks)
 
     # more plot formatting
-    # ax.set_xlim(max(0, mean - 5 * sigma), mean + 5 * sigma)
+    ax.set_xlim(max(0, mean_bg - 5 * sigma_bg), mean_sig + 5 * sigma_sig)
     ax.set_ylim(1, 10**(int(np.log10(max(hist[0]))) + 1))
     plt.title(title.format(int(np.log10(len(TSD.T[0]))), len(arr), np.degrees(bandWidth), source['name']))
-    plt.xlabel('Number of Events in Bin')
-    plt.ylabel('Counts', color = 'b')
-    # plt.axvline(x = mean, linestyle = '--')
-    # ax2 = ax.twinx()
+    plt.xlabel(u'Events in 1\xb0 Bin')
+    plt.ylabel('Trials')
+    plt.axvline(x = mean_sig, linestyle = '--')
+    plt.axvline(x = mean_bg + 3 * sigma_bg, linestyle = '-', color='g')
+    #plt.axvline(x = hist[1][[ i for i,x in enumerate(ccdf) if x<.1 ][0]], linestyle = '--', color='g')
+    ax2 = ax.twinx()
     # ax3 = ax.twiny()
 
     # plot p-values
-    # ax2.plot(hist[1][:-1], ccdf, 'r-')
+    ax2.plot(hist[1][:-1], ccdf, 'r-')
 
     # shade 3 sigma interval
     # plt.axvspan(mean - 3 * sigma, mean + 3 * sigma, facecolor='0.2', alpha=0.5)
 
     # even more plot formatting
-    # ax2.set_ylabel('p-value', color = 'r')
-    # ax2.set_xlim(max(0, mean - 5 * sigma), mean + 5 * sigma)
+    ax2.set_ylabel('p-value of background', color = 'r')
+    ax2.set_xlim(max(0, mean_bg - 5 * sigma_bg), mean_sig + 5 * sigma_sig)
     # ticks = [(mean - 3 * sigma, r'3$\sigma$'),
     #               (mean - sigma, r'$\sigma$'),
     #               (mean, r'$\mu$'),
