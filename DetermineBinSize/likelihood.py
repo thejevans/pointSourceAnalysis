@@ -13,7 +13,7 @@ def getBackground(mc, timeWindow, spectralIndex, binDiameter):
 def getSignal(binDiameter, mu, sigma, rate):
     data = np.empty(rate, dtype=[('ra', np.float), ('dec', np.float)])
 
-    for i in xrange(rate):
+    for i in range(rate):
         data[i]['ra'], data[i]['dec'] = np.random.multivariate_normal(mu, sigma * np.identity(2))
 
     return len(inBin(data, binDiameter))
