@@ -5,24 +5,28 @@ from itertools import product
 
 def RateVsBin(mc, rates, bins, rateType = 'value', outfile = 'out.csv', **kwargs):
     likelihoods = {}
+    kwargs2 = {}
 
     for rate, binDiameter in product(rates, bins):
-        kwargs2 = {'value':    {'rate_value': rate, 'binDiameter': binDiameter}.update(kwargs),
-                   'poisson':  {'lam': rate, 'binDiameter': binDiameter}.update(kwargs),
-                   #'gaussian': {'rate_mu': rate['mu'], 'rate_sigma': rate['sigma'], 'binDiameter': binDiameter}.update(kwargs)
+        kwargs2 = {'value':    {'rate_value': rate, 'binDiameter': binDiameter},
+                   'poisson':  {'lam': rate, 'binDiameter': binDiameter},
+                   #'gaussian': {'rate_mu': rate['mu'], 'rate_sigma': rate['sigma'], 'binDiameter': binDiameter}
         }[rateType]
+        kwargs2.update(kwargs)
         likelihoods.update({(rate, binDiameter):likelihood.getLikelihood(mc, **kwargs2)})
 
     output(likelihoods,outfile)
 
 def RateVsIndex(mc, rates, spectralIndicies, rateType = 'value', outfile = 'out.csv', **kwargs):
     likelihoods = {}
+    kwargs2 = {}
 
     for rate, spectralIndex in product(rates, spectralIndicies):
-        kwargs2 = {'value':    {'rate_value': rate, 'spectralIndex': spectralIndex}.update(kwargs),
-                   'poisson':  {'lam': rate, 'spectralIndex': spectralIndex}.update(kwargs),
-                   #'gaussian': {'rate_mu': rate['mu'], 'rate_sigma': rate['sigma'], 'spectralIndex': spectralIndex}.update(kwargs)
+        kwargs2 = {'value':    {'rate_value': rate, 'spectralIndex': spectralIndex},
+                   'poisson':  {'lam': rate, 'spectralIndex': spectralIndex},
+                   #'gaussian': {'rate_mu': rate['mu'], 'rate_sigma': rate['sigma'], 'spectralIndex': spectralIndex}
         }[rateType]
+        kwargs2.update(kwargs)
         likelihoods.update({(rate, spectralIndex):likelihood.getLikelihood(mc, **kwargs2)})
 
     output(likelihoods,outfile)
