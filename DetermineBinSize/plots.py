@@ -14,7 +14,6 @@ def RateVsBin(mc, rates, bins, rateType = 'value', outfile = 'out.csv', **kwargs
         }[rateType]()})
 
     output(likelihoods,outfile)
-    return
 
 def RateVsIndex(mc, rates, spectralIndicies, rateType = 'value', outfile = 'out.csv', **kwargs):
     likelihoods = {}
@@ -27,20 +26,17 @@ def RateVsIndex(mc, rates, spectralIndicies, rateType = 'value', outfile = 'out.
         }[rateType]()})
 
     output(likelihoods,outfile)
-    return
 
 def output(likelihoods, outfile):
     if outfile[outfile.rfind('.')+1:] == 'csv':
         df = munge(likelihoods)
         df.to_csv(outfile, sep='\t')
-    else
+    else:
         heatmap = sns.heatmap(munge(likelihoods), annot=True)
         fig = heatmap.get_figure()
         fig.savefig(outfile)
-    return
 
 def munge(likelihoods):
     s  = pd.Series(likelihoods, index=pd.MultiIndex.from_tuples(likelihoods))
     df = s.unstack()
     df.combine_first(df.T).fillna(0)
-    return

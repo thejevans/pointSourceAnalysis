@@ -8,7 +8,7 @@ source = {'name':'Milagro 1908',
 
 def getBackground(mc, timeWindow, spectralIndex, binDiameter):
     arr = inBin(mc, binDiameter)
-    return sum(timeWindow*arr['ow']*arr['trueE']**spectralIndex)
+    return np.sum(1e-18 * mc['ow'] * np.power(mc['trueE']/100e3, spectralIndex)) * timeWindow
 
 def getSignal(binDiameter, mu, sigma, rate):
     data = np.empty(len(rate), dtype=[('ra', np.float), ('dec', np.float)])
@@ -20,7 +20,7 @@ def getSignal(binDiameter, mu, sigma, rate):
 
 def inBin(arr, binDiameter):
     distFromSource = lambda x: np.sqrt((x['ra'] - source['ra'])**2 + (x['dec'] - source['dec'])**2)
-    return np.array([x if distFromSource(x) < binDiameter for x in arr.T])
+    return np.array([x for x in arr.T if distFromSource(x) < binDiameter])
 
 def getLikelihood(mc,
                   spectralIndex = -2,
