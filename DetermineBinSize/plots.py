@@ -11,7 +11,7 @@ def RateVsBin(mc, rates, bins, rateType = 'value', outfile = 'out.csv', **kwargs
         'value':    likelihood.getLikelihood(mc, rate_value = rate, binDiameter = binDiameter, **kwargs),
         'poisson':  likelihood.getLikelihood(mc, lam = rate, binDiameter = binDiameter, **kwargs),
         #'gaussian': likelihood.getLikelihood(mc, rate_mu = rate['mu'], rate_sigma = rate['sigma'], binDiameter = binDiameter, **kwargs)
-        }[rateType]()})
+        }[rateType]})
 
     output(likelihoods,outfile)
 
@@ -23,7 +23,7 @@ def RateVsIndex(mc, rates, spectralIndicies, rateType = 'value', outfile = 'out.
         'value':    likelihood.getLikelihood(mc, rate_value = rate, spectralIndex = spectralIndex, **kwargs),
         'poisson':  likelihood.getLikelihood(mc, lam = rate, spectralIndex = spectralIndex, **kwargs),
         #'gaussian': likelihood.getLikelihood(mc, rate_mu = rate['mu'], rate_sigma = rate['sigma'], spectralIndex = spectralIndex, **kwargs)
-        }[rateType]()})
+        }[rateType]})
 
     output(likelihoods,outfile)
 
