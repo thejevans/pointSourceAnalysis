@@ -1,0 +1,34 @@
+import numpy as np
+import calculate
+import sys
+import matplotlib.pyplot as plt
+
+import pickle
+
+if sys.argv[1][-3:] == 'npy':
+    arr    = np.load(sys.argv[1])
+    bins   = np.radians(np.arange(0.1, 5, .01))
+    source = {'name':'Milagro 1908',
+              'sigma':np.radians(0.06),
+              'ra':np.radians(287.05),
+              'dec':np.radians(6.39)}
+    time   = 365 * 24 * 60 * 60 * int(sys.argv[3])
+    index  = -2
+    lam    = range(0,5)
+    sig    = [calculate.signal_probability(source, index, x, arr, time) for x in lam]
+
+    f = open(''.join(['./', sys.argv[2], '.pkl']), 'wb')
+    pickle.dump((lam, sig), f)
+    f.close()
+
+elif sys.argv[1][-3:] == 'pkl':
+    f         = open(sys.argv[1], 'rb')
+    lam, sig = pickle.load(f)
+    lam = np.array(range(0,5))
+    f.close()
+print [x[0] for x in sig]
+
+# plt.plot(lam, sig)
+# plt.xlabel('Bin Diameter in degrees')
+# plt.ylabel('Number of expected signal neutrinos per square degree per year')
+# plt.savefig(''.join(['./', sys.argv[2], '.pdf']))
