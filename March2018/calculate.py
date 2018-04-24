@@ -5,23 +5,30 @@ def background_rate(source, band_width, arr, time_window):
     area = 360**2 * (np.cos(source['ra'] + band_width / 2) + np.cos(np.cos(source['ra'] - band_width / 2))) / (2 * np.pi)
     # get list of events in band
     events = [x for x in arr.T if np.abs(x['dec']-source['dec']) < (band_width / 2)]
-
     return len(events) / (area * time_window)
 
-def signal_probability(source, spectral_index, lam, mc, time_window):
-    sample   = lam #np.random.poisson(lam)
-    reweight = lambda x: 1e-18 * x['ow'] * np.power(x['trueE']/100e3, spectral_index) * time_window
-    # list of probabilities in time window
-    w   = [reweight(x) for x in mc]
-    arr = np.array([x for i,x in enumerate(mc) if w[i] > sample], dtype = mc.dtype)
-    w   = [x for x in w if x > sample]
-    # returns probability of seeing (lam) signal events in (time_window) seconds at (spectral_index)
-    return np.sum(w), w, arr
+def signal_cut(source, band_width, mc):
+    in_band = [delta_angle(x['ra'],0,source['ra'],0) < band_width / 2 for x in mc]
+    in_bin  = [delta_angle(x['zenith'],x['azimuth'],x['trueZenith'],x['trueAzimuth']) < band_width / 2 for x in mc]
+    product = [a*b for a,b in zip(in_band,in_bin)]
+    return np.array(product, dtype = bool)
 
-def delta_angle((ra1, dec1), (ra2, dec2)):
+def mc_weight(mc, spectral_index, time_window):
+    reweight = lambda x: 1e-18 * x['ow'] * np.power(x['trueE']/100e3, spectral_index) * time_window
+    weights = [reweight(x) for x in mc]
+    return sum(weights), weights
+
+def delta_angle(ra1, dec1, ra2, dec2):
     # theta is angular distance in radians
-    cos_theta = np.sin(dec1) * np.sin(dec2) + np.cos(dec1) * np.cos(dec2) * np.sin(ra1 - ra2)
+    cos_theta = np.sin(dec1) * np.sin(dec2) + np.cos(dec1) * np.cos(dec2) * np.cos(ra1 - ra2)
     return np.abs(np.arccos(cos_theta))
+
+def ang_res(cut_mc):
+    delta_angles = [delta_angle(x['zenith'],x['azimuth'],x['trueZenith'],x['trueAzimuth']) for x in cut_mc]
+    mean = np.mean(delta_angles)
+    minimum = min(delta_angles)
+    maximum = max(delta_angles)
+    return mean, minimum, maximum
 
 def bin_area(band_width):
     # solid angle area

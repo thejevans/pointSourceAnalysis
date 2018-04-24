@@ -11,8 +11,8 @@ if sys.argv[1][-3:] == 'npy':
               'sigma':np.radians(0.06),
               'ra':np.radians(287.05),
               'dec':np.radians(6.39)}
-    time   = 365 * 24 * 60 * 60 * int(sys.argv[3])
-    bgs    = [calculate.background_rate(source, x, arr, time) for x in bins]
+    time   = 365 * 24 * 60 * 60
+    bgs    = [calculate.background_rate(source, x, arr, time) * time * calculate.bin_area(x) for x in bins]
 
     f = open(''.join(['./', sys.argv[2], '.pkl']), 'wb')
     pickle.dump((bins, bgs), f)
